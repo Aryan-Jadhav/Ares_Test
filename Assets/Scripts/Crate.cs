@@ -10,7 +10,12 @@ public class Crate : MonoBehaviour
     [SerializeField] private CardColor crateColor;
     [SerializeField] private int maxCapacity = 5;
 
+    [SerializeField] private Transform[] acceptPoints;
+    public CardColor CrateColor => crateColor;
+
     private List<Card> storedCards = new List<Card>();
+
+    private List<Card> myCards = new List<Card>();
 
     public void OnTapped()
     {
@@ -19,9 +24,7 @@ public class Crate : MonoBehaviour
 
     private IEnumerator ReleaseRoutine()
     {
-        Card[] cards = GetComponentsInChildren<Card>();
-
-        foreach (Card card in cards)
+        foreach (Card card in myCards)
         {
             if (!card.IsMatched)
             {
@@ -47,16 +50,15 @@ public class Crate : MonoBehaviour
 
     private void AcceptCard(Card card)
     {
+        if (storedCards.Count >= acceptPoints.Length) return;
+
+        Transform targetPoint = acceptPoints[storedCards.Count];
 
         storedCards.Add(card);
 
-        Vector3 stackPosition = transform.position + Vector3.up * storedCards.Count * 0.25f;
-
-        card.JumpIntoCrate(stackPosition, () =>
+        card.JumpIntoCrate(targetPoint.position, () =>
         {
-            Debug.Log("card accpeted");
-            card.transform.SetParent(transform);
-            card.transform.localPosition = Vector3.up * (storedCards.Count - 1) * 0.25f;
+            card.transform.SetParent(transform, true);
         });
 
         if (storedCards.Count >= maxCapacity)
@@ -76,5 +78,10 @@ public class Crate : MonoBehaviour
             {
                 gameObject.SetActive(false);
             });
+    }
+
+    public void RegisterCard(Card card)
+    {
+        myCards.Add(card);
     }
 }

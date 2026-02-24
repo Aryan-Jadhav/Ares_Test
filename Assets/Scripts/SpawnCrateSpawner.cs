@@ -1,9 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SimpleSpawner : MonoBehaviour
 {
     [SerializeField] private SpawnCrateData spawnConfig;
-    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField] private float spacing = 2f;
 
     private void Start()
     {
@@ -14,13 +14,29 @@ public class SimpleSpawner : MonoBehaviour
     {
         for (int i = 0; i < spawnConfig.prefabs.Count; i++)
         {
-            if (i >= spawnPoints.Length) break;
+            GameObject prefab = spawnConfig.prefabs[i];
 
-            Instantiate(
-                spawnConfig.prefabs[i],
-                spawnPoints[i].position,
-                Quaternion.identity
+            // Rotation logic
+            Vector3 prefabEuler = prefab.transform.rotation.eulerAngles;
+            Vector3 spawnEuler = transform.rotation.eulerAngles;
+
+            Quaternion finalRotation = Quaternion.Euler(
+                prefabEuler.x,
+                spawnEuler.y,
+                prefabEuler.z
             );
+
+            // Offset along spawn point's right direction
+            Vector3 offset = transform.forward * i * spacing;
+
+            GameObject obj = Instantiate(
+                prefab,
+                transform.position + offset,
+                finalRotation
+            );
+
+            obj.transform.SetParent(transform);
         }
+
     }
 }

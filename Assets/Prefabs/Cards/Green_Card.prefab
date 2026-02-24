@@ -248,7 +248,7 @@ MonoBehaviour:
     color: {r: 0, g: 0, b: 0, a: 0}
     size: 0
     percent: 0
-  wrapMode: 0
+  wrapMode: 1
   followMode: 0
   autoStartPosition: 0
   _follow: 1
