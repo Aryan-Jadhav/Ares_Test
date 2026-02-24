@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using Dreamteck.Splines;
+using DG.Tweening;
 
 public class Crate : MonoBehaviour
 {
+
     [SerializeField] private CardColor crateColor;
     [SerializeField] private int maxCapacity = 5;
 
@@ -10,63 +14,67 @@ public class Crate : MonoBehaviour
 
     public void OnTapped()
     {
+        StartCoroutine(ReleaseRoutine());
+    }
+
+    private IEnumerator ReleaseRoutine()
+    {
         Card[] cards = GetComponentsInChildren<Card>();
 
         foreach (Card card in cards)
         {
-            card.MoveOutside();
+            if (!card.IsMatched)
+            {
+                card.StartMoving();
+                yield return new WaitForSeconds(0.1f);
+            }
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Something entered trigger: " + other.name);
 
-        // Layer Check
-        if (other.gameObject.layer != LayerMask.NameToLayer("Card"))
-        {
-            Debug.Log("Rejected: Not on Card layer");
-            return;
-        }
+        if (!other.CompareTag("Card")) return;
 
-        Debug.Log("Layer is Card");
-
-        // Get Card component
+        Debug.Log("card entered");
         Card card = other.GetComponent<Card>();
-        if (card == null)
-        {
-            Debug.Log("Rejected: No Card component found");
-            return;
-        }
-
-        Debug.Log("Card component found");
-
-        // Color check
-        if (card.Color != crateColor)
-        {
-            Debug.Log("Rejected: Color mismatch. Card: "
-                      + card.Color + " | Crate: " + crateColor);
-            return;
-        }
-
-        Debug.Log("Color matched! Accepting card.");
+        if (card == null) return;
+        if (card.Color != crateColor) return;
+        if (card.IsMatched) return;
 
         AcceptCard(card);
     }
 
     private void AcceptCard(Card card)
     {
+
         storedCards.Add(card);
 
-        card.StopMoving();
+        Vector3 stackPosition = transform.position + Vector3.up * storedCards.Count * 0.25f;
 
-        card.transform.SetParent(transform);
-        card.transform.localPosition = Vector3.up * storedCards.Count * 0.25f;
+        card.JumpIntoCrate(stackPosition, () =>
+        {
+            Debug.Log("card accpeted");
+            card.transform.SetParent(transform);
+            card.transform.localPosition = Vector3.up * (storedCards.Count - 1) * 0.25f;
+        });
 
         if (storedCards.Count >= maxCapacity)
         {
-            Debug.Log("Crate Full!");
-            gameObject.SetActive(false);
+            AnimateCrateDisappear();
         }
+    }
+
+    private void AnimateCrateDisappear()
+    {
+        transform.DOPunchScale(Vector3.one * 0.2f, 0.2f);
+
+        transform.DOScale(Vector3.zero, 0.3f)
+            .SetDelay(0.2f)
+            .SetEase(Ease.InBack)
+            .OnComplete(() =>
+            {
+                gameObject.SetActive(false);
+            });
     }
 }

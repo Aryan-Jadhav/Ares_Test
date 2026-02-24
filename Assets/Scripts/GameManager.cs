@@ -1,42 +1,39 @@
 using UnityEngine;
+using Dreamteck.Splines;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private Camera _mainCamera;
+    public static GameManager Instance;
+
+    [SerializeField] private Transform conveyorStartPoint;
+    public Transform ConveyorStartPoint => conveyorStartPoint;
+
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private SplineComputer mainSpline;
+
+    public SplineComputer MainSpline => mainSpline;
 
     private void Awake()
     {
-        if (_mainCamera == null)
-            _mainCamera = Camera.main;
+        Instance = this;
+
+        if (mainCamera == null)
+            mainCamera = Camera.main;
     }
 
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Screen Tapped");
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-            Ray _ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(_ray, out RaycastHit _hit))
+            if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                Debug.Log("Hit Object: " + _hit.collider.name);
-
-                Crate _crate = _hit.collider.GetComponent<Crate>();
-
-                if (_crate != null)
+                Crate crate = hit.collider.GetComponent<Crate>();
+                if (crate != null)
                 {
-                    Debug.Log("Crate Found!");
-                    _crate.OnTapped();
+                    crate.OnTapped();
                 }
-                else
-                {
-                    Debug.Log("Tapped object is NOT a crate");
-                }
-            }
-            else
-            {
-                Debug.Log("Raycast did NOT hit anything");
             }
         }
     }

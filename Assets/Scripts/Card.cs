@@ -1,45 +1,62 @@
 ﻿using UnityEngine;
+using Dreamteck.Splines;
 using DG.Tweening;
 
 public class Card : MonoBehaviour
 {
-    [SerializeField] private CardColor _cardColor;
+    [SerializeField] private CardColor cardColor;
+    [SerializeField] private float moveSpeed = 4f;
 
-    [SerializeField] private float _moveSpeed = 5f;
-    [SerializeField] private float _duration = 5f;
+    private SplineFollower follower;
+    private bool isMatched = false;
 
-    private Vector3 _targetPosition;
-    private bool _isMoving = false;
+    public CardColor Color => cardColor;
+    public bool IsMatched => isMatched;
 
-    public CardColor Color => _cardColor;
+    private void Awake()
+    {
+        follower = GetComponent<SplineFollower>();
+        follower.follow = false;
+        follower.spline = null;
+    }
 
-    [SerializeField] private float _moveOffset = 1f;
+    public void StartMoving()
+    {
+        if (isMatched) return;
+
+        transform.SetParent(null);
+
+        Vector3 jumpTarget = GameManager.Instance.ConveyorStartPoint.position;
+
+        transform.DOJump(jumpTarget, 1f, 1, 0.35f)
+            .SetEase(Ease.OutQuad)
+            .OnComplete(() =>
+            {
+                follower.spline = GameManager.Instance.MainSpline;
+                follower.SetPercent(0);
+                follower.followSpeed = moveSpeed;
+                follower.follow = true;
+            });
+    }
 
     public void StopMoving()
     {
-        _isMoving = false;
+        follower.follow = false;
     }
 
-
-    public void MoveOutside()
+    public void JumpIntoCrate(Vector3 targetPos, System.Action onComplete)
     {
-        transform.SetParent(null);
-        transform.DOMoveZ(_moveSpeed, _duration).OnComplete(() =>
-        {
-            transform.DOMoveX(_moveOffset, _duration);
-        }
-        );
+        if (isMatched) return;
+
+        isMatched = true;
+        StopMoving();
+
+        transform.DOJump(targetPos, 1.2f, 1, 0.35f)
+            .SetEase(Ease.OutQuad)
+            .OnComplete(() =>
+            {
+                onComplete?.Invoke();
+            });
     }
 
-    private void Update()
-    {
-        if (!_isMoving) return;
-
-        transform.position = Vector3.MoveTowards(transform.position, _targetPosition, _moveSpeed * Time.deltaTime);
-
-        if (Vector3.Distance(transform.position, _targetPosition) < 0.01f)
-        {
-            _isMoving = false;
-        }
-    }
 }
