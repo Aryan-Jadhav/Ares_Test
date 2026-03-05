@@ -32,6 +32,11 @@ public class Crate : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
             }
         }
+
+        // Wait one frame to ensure re-parenting happened
+        yield return null;
+
+        CheckIfEmpty();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -56,10 +61,15 @@ public class Crate : MonoBehaviour
 
         storedCards.Add(card);
 
-        card.JumpIntoCrate(targetPoint.position, () =>
-        {
-            card.transform.SetParent(transform, true);
-        });
+        AudioManager.Instance.PlayBeltToAccept();
+
+        card.JumpIntoCrate(
+            targetPoint.position,
+            targetPoint.rotation,
+            () =>
+            {
+                card.transform.SetParent(transform, true);
+            });
 
         if (storedCards.Count >= maxCapacity)
         {
@@ -71,17 +81,63 @@ public class Crate : MonoBehaviour
     {
         transform.DOPunchScale(Vector3.one * 0.2f, 0.2f);
 
+        AudioManager.Instance.PlayCrateDestroy();
+
         transform.DOScale(Vector3.zero, 0.3f)
             .SetDelay(0.2f)
             .SetEase(Ease.InBack)
             .OnComplete(() =>
             {
-                gameObject.SetActive(false);
+                AcceptingCrateSpawner spawner = GetComponentInParent<AcceptingCrateSpawner>();
+
+                if (spawner != null)
+                {
+                    spawner.RemoveCrateAndShift(transform);
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
             });
     }
 
     public void RegisterCard(Card card)
     {
         myCards.Add(card);
+    }
+
+    private void CheckIfEmpty()
+    {
+        bool hasAnyChildCards = false;
+
+        foreach (Card card in myCards)
+        {
+            if (card != null && card.transform.parent == transform)
+            {
+                hasAnyChildCards = true;
+                break;
+            }
+        }
+
+        if (!hasAnyChildCards)
+        {
+            DestroyAndShift();
+        }
+    }
+
+    private void DestroyAndShift()
+    {
+        SpawnCrateSpawner spawner = GetComponentInParent<SpawnCrateSpawner>();
+
+        if (spawner != null)
+        {
+            spawner.RemoveCrateAndShift(transform);
+        }
+
+    }
+
+    public void SetCrateColor(CardColor color)
+    {
+        crateColor = color;
     }
 }

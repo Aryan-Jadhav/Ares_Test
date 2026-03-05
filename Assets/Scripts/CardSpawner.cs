@@ -8,6 +8,9 @@ public class CardSpawner : MonoBehaviour
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private int cardCount = 6;
 
+    private CardColor selectedPackColor;
+    public CardColor SelectedPackColor => selectedPackColor;
+
     private Crate crate;
 
     private void Awake()
@@ -24,22 +27,23 @@ public class CardSpawner : MonoBehaviour
     {
         Card selectedPrefab = GetRandomCardPrefabExcludingCrateColor();
 
+        selectedPackColor = selectedPrefab.Color;
+
         for (int i = 0; i < cardCount && i < spawnPoints.Length; i++)
         {
             Transform spawnPoint = spawnPoints[i];
 
             Card card = Instantiate(
                 selectedPrefab,
-                spawnPoint.position,     // Position from spawn point
-                spawnPoint.rotation      // Rotation from spawn point
+                spawnPoint.position,
+                spawnPoint.rotation
             );
 
-            // Keep world transform when parenting
             card.transform.SetParent(transform, true);
-
             crate.RegisterCard(card);
         }
     }
+
     private Card GetRandomCardPrefabExcludingCrateColor()
     {
         List<Card> validPrefabs = new List<Card>();

@@ -10,11 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb575a1e169b7ed4da22642cab727b0e, type: 3}
-  m_Name: SpawnCrateData
+  m_Name: SpawnCrateData 1
   m_EditorClassIdentifier: Assembly-CSharp::SpawnCrateData
   prefabs:
-  - {fileID: 450221578034605651, guid: 03bd4994c44ff364ea3487c975e15aa4, type: 3}
-  - {fileID: 450221578034605651, guid: 99174bc4bd9847f448f89909ad8385e8, type: 3}
   - {fileID: 450221578034605651, guid: 3942d52e04877d045b2483464af042ee, type: 3}
-  - {fileID: 4439339239069836625, guid: 52cb12406b31c3f4fa9cfb8468dd77a3, type: 3}
-  - {fileID: 4439339239069836625, guid: 5144825b4d6290248a93551e5b3282b4, type: 3}
+  - {fileID: 450221578034605651, guid: 99174bc4bd9847f448f89909ad8385e8, type: 3}
+  - {fileID: 450221578034605651, guid: 03bd4994c44ff364ea3487c975e15aa4, type: 3}

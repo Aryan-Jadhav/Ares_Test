@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     [SerializeField] private SplineComputer mainSpline;
 
+    private float tapCooldown = 0.3f;
+    private float lastTapTime = -1f;
+
     public SplineComputer MainSpline => mainSpline;
 
     private void Awake()
@@ -21,19 +24,37 @@ public class GameManager : MonoBehaviour
             mainCamera = Camera.main;
     }
 
+
+
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        if (Time.time - lastTapTime < tapCooldown)
+            return;
 
-            if (Physics.Raycast(ray, out RaycastHit hit))
+        // Touch input (mobile)
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            HandleTap(Input.GetTouch(0).position);
+        }
+        // Mouse input (PC / Editor)
+        else if (Input.GetMouseButtonDown(0))
+        {
+            HandleTap(Input.mousePosition);
+        }
+    }
+
+    private void HandleTap(Vector2 screenPosition)
+    {
+        lastTapTime = Time.time;
+
+        Ray ray = mainCamera.ScreenPointToRay(screenPosition);
+
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Crate crate = hit.collider.GetComponent<Crate>();
+            if (crate != null)
             {
-                Crate crate = hit.collider.GetComponent<Crate>();
-                if (crate != null)
-                {
-                    crate.OnTapped();
-                }
+                crate.OnTapped();
             }
         }
     }

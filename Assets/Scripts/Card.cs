@@ -28,6 +28,8 @@ public class Card : MonoBehaviour
 
         Vector3 jumpTarget = GameManager.Instance.ConveyorStartPoint.position;
 
+        AudioManager.Instance.PlayCardToBelt();
+
         transform.DOJump(jumpTarget, 1f, 1, 0.35f)
             .SetEase(Ease.OutQuad)
             .OnComplete(() =>
@@ -44,14 +46,19 @@ public class Card : MonoBehaviour
         follower.follow = false;
     }
 
-    public void JumpIntoCrate(Vector3 targetPos, System.Action onComplete)
+    public void JumpIntoCrate(Vector3 targetPos, Quaternion targetRotation, System.Action onComplete)
     {
         if (isMatched) return;
 
         isMatched = true;
         StopMoving();
 
-        transform.DOJump(targetPos, 1.2f, 1, 0.35f)
+        float duration = 0.35f;
+
+        transform.DORotateQuaternion(targetRotation, duration)
+            .SetEase(Ease.InOutSine);
+
+        transform.DOJump(targetPos, 1.2f, 1, duration)
             .SetEase(Ease.OutQuad)
             .OnComplete(() =>
             {

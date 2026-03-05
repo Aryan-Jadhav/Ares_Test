@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d1e3f5b4afbb5142a06d0ed20a51aaa, type: 3}
+  m_Name: AcceptingCrateData
+  m_EditorClassIdentifier: Assembly-CSharp::AcceptingCrateData
+  crateEntries:
+  - color: 0
+    cratePrefab: {fileID: 4153493964691730511, guid: df4062758c4bbda419137c3893665748, type: 3}
+  - color: 2
+    cratePrefab: {fileID: 4153493964691730511, guid: ff11939a00ea0e9469ce9a623396eef1, type: 3}
+  - color: 3
+    cratePrefab: {fileID: 4153493964691730511, guid: cbe15bfa519b79b4abae7587403c2d97, type: 3}
+  - color: 5
+    cratePrefab: {fileID: 4153493964691730511, guid: 303708db21d770748aa4576d017f0a50, type: 3}
+  - color: 6
+    cratePrefab: {fileID: 4153493964691730511, guid: acac3deb7a9ed4340a35b860a6c49f72, type: 3}
