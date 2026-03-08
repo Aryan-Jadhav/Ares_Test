@@ -92,6 +92,6 @@ Scalable gameplay systems
 YouTube Video Link:
 https://www.youtube.com/watch?v=-fKC1-M1PeA
 
-Author
+Author:
 Aryan Jadhav
 Unity Developer
